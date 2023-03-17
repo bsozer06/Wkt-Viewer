@@ -1,0 +1,32 @@
+<form #wktForm="ngForm" (ngSubmit)="onSubmit(wktForm)">
+    <div class="form-group">
+        <div class="input-wkt">
+            <label>Enter WKT</label>
+            <textarea rows="5" cols="50"
+                matInput 
+                class="form-control" 
+                id="wkt-textarea-id" 
+                name="wkt" 
+                ngModel
+                [value]="wktFormVal.wkt" 
+                placeholder="Example: POLYGON ((-10 46, -12 34, -14 20, -10 46))">
+            </textarea>
+        </div>
+    </div>
+    <div>
+        <div class="input-epsg">
+            <label>EPSG</label>
+            <textarea rows="5" cols="50"
+                matInput
+                placeholder="Example: 4326" 
+                class="form-control" 
+                id="epsg-textarea-id" 
+                name="epsg" 
+                [value]="wktFormVal.epsg"
+                ngModel>
+            </textarea>
+        </div>
+    </div>
+    <button mat-raised-button color="primary" type="submit">Ok</button>
+
+</form>
