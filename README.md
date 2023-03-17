@@ -32,4 +32,5 @@ The communication amongst component is enabled by utilizing EventService. Input 
 - Import other file types such as shapefile, geojson and so on.
 - Projections helper class can be developed by using Proj4 library.
 - LayerService should be updated.
+- Point geometry feature should be added to render it on map.
 - Unnecessary comments should be removed.
