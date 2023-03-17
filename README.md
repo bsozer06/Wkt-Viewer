@@ -31,3 +31,5 @@ The communication amongst component is enabled by utilizing EventService. Input 
 - State managements can be managed with Ngrx instead of the service structure.
 - Import other file types such as shapefile, geojson and so on.
 - Projections helper class can be developed by using Proj4 library.
+- LayerService should be updated.
+- Unnecessary comments should be removed.
