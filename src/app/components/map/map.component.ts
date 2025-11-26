@@ -26,7 +26,10 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   map!: Map;
   view!: MapView;
   graphicLayer!: GraphicsLayer;
+  sketch?: Sketch;
   private _subscription: Subscription[] = [];
+  private _isEditMode = false;
+  private _shouldAutoEdit = false;
 
   constructor(
     private _mapService: MapService,
@@ -37,7 +40,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       this._eventService.getOnWktFormChange().subscribe((val) => {
         this.wktForm.epsg = val.epsg;
         this.wktForm.wkt = val.wkt;
-        this.addGraphicsToMap(val);
+        this.addGraphicsToMap(val, val.autoEdit || false);
         console.log('map comp: getOnWktFormChange', val);
       })
     );
@@ -64,38 +67,51 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   // ngOnChanges removed; component does not rely on change detection hooks here
 
-  public addGraphicsToMap(wktForm: WktForm): void {
+  public addGraphicsToMap(wktForm: WktForm, autoEdit = false): void {
     const wkt = (wktForm?.wkt || '').trim();
+    // If WKT is empty, just clear and exit
+    if (!wkt) {
+      if (this.graphicLayer) {
+        this.graphicLayer.removeAll();
+      }
+      this._eventService.emitGraphicChange(undefined as any);
+      this._shouldAutoEdit = false;
+      return;
+    }
+
+    // Set auto-edit flag only when explicitly requested
+    this._shouldAutoEdit = autoEdit;
+
     // Clear previous graphics on each update
     if (this.graphicLayer) {
       this.graphicLayer.removeAll();
-    }
-    // If WKT is empty, just clear and exit
-    if (!wkt) {
-      this._eventService.emitGraphicChange(undefined as any);
-      return;
     }
     const geomType = WktHelper.GetGeomType(wkt);
     let coordsArr = WktHelper.WktToCoordArray(wkt);
     // Attempt reprojection to map SR if EPSG differs
     const targetEpsg = this.view.spatialReference?.wkid?.toString() || '3857';
+    let finalEpsg = Number(wktForm.epsg);
     if (wktForm.epsg && targetEpsg && wktForm.epsg !== targetEpsg) {
       coordsArr = ProjectionHelper.ReprojectCoords(
         coordsArr as number[][],
         wktForm.epsg,
         targetEpsg
       );
+      finalEpsg = Number(targetEpsg);
     }
-    console.log('addGraphicsToMap');
+    console.log('addGraphicsToMap', geomType, coordsArr);
     switch (geomType) {
       case 'POLYGON':
-        this._addPolygonToGraphicLayer(coordsArr, Number(wktForm.epsg));
+        this._addPolygonToGraphicLayer(coordsArr, finalEpsg);
         break;
       case 'LINESTRING':
-        this._addLinestringToGraphicLayer(coordsArr, Number(wktForm.epsg));
+        this._addLinestringToGraphicLayer(coordsArr, finalEpsg);
         break;
       case 'POINT':
-        this._addPointToGraphicLayer(coordsArr, Number(wktForm.epsg));
+        this._addPointToGraphicLayer(coordsArr, finalEpsg);
+        break;
+      case 'MULTIPOINT':
+        this._addMultiPointToGraphicLayer(coordsArr, finalEpsg);
         break;
       default:
         // Unknown or unsupported type: do not add
@@ -130,6 +146,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this._layerService.setGraphicLayerInstance(this.graphicLayer);
     this._layerService.setGraphicInstance(polygonGraphic);
     this._eventService.emitGraphicChange(polygonGraphic);
+
+    // Enable editing on the imported graphic only if requested
+    if (this._shouldAutoEdit) {
+      this._enableEditingOnGraphic(polygonGraphic);
+    }
   }
   private _addLinestringToGraphicLayer(coordsArr: any[], epsg: number): void {
     debugger;
@@ -154,6 +175,11 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this._layerService.setGraphicLayerInstance(this.graphicLayer);
     this._layerService.setGraphicInstance(polylineGraphic);
     this._eventService.emitGraphicChange(polylineGraphic);
+
+    // Enable editing on the imported graphic only if requested
+    if (this._shouldAutoEdit) {
+      this._enableEditingOnGraphic(polylineGraphic);
+    }
   }
 
   private _addPointToGraphicLayer(coordsArr: any[], epsg: number): void {
@@ -186,6 +212,48 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this._layerService.setGraphicLayerInstance(this.graphicLayer);
     this._layerService.setGraphicInstance(pointGraphic);
     this._eventService.emitGraphicChange(pointGraphic);
+
+    // Enable editing on the imported graphic only if requested
+    if (this._shouldAutoEdit) {
+      this._enableEditingOnGraphic(pointGraphic);
+    }
+  }
+
+  private _addMultiPointToGraphicLayer(coordsArr: any[], epsg: number): void {
+    if (!coordsArr || coordsArr.length === 0) {
+      return;
+    }
+
+    // Create a marker symbol for all points
+    const markerSymbol = {
+      type: 'simple-marker',
+      style: 'circle',
+      color: [0, 122, 255, 1],
+      size: 8,
+      outline: { color: [255, 255, 255, 1], width: 2 },
+    } as __esri.SimpleMarkerSymbolProperties;
+
+    // Add each point as a separate graphic
+    coordsArr.forEach((coord: number[]) => {
+      if (coord && coord.length >= 2) {
+        const point = {
+          type: 'point',
+          x: coord[0],
+          y: coord[1],
+          spatialReference: new SpatialReference({ wkid: epsg }),
+        } as __esri.PointProperties;
+
+        const pointGraphic = new Graphic({
+          geometry: point,
+          visible: true,
+          symbol: markerSymbol,
+        });
+
+        this.graphicLayer.add(pointGraphic);
+      }
+    });
+
+    this._layerService.setGraphicLayerInstance(this.graphicLayer);
   }
 
   // private _testLoadingPolygonData(): any {
@@ -221,26 +289,47 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private _loadSketchTool(): void {
     this.view.when(() => {
-      const sketch = new Sketch({
+      this.sketch = new Sketch({
         layer: this.graphicLayer,
         view: this.view,
         // graphic will be selected as soon as it is created
         creationMode: 'update',
       });
-      sketch.on('create', (e) => {
-        if ((e.state = 'complete')) {
+      this.sketch.on('create', (e) => {
+        if (e.state === 'start') {
+          this._isEditMode = true;
+        } else if (e.state === 'complete') {
+          this._isEditMode = false;
           this._layerService.setGraphicInstance(e.graphic);
           this._eventService.emitGraphicChange(e.graphic);
         }
       });
-      sketch.on('update', (e) => {
-        if ((e.state = 'complete')) {
+      this.sketch.on('update', (e) => {
+        if (e.state === 'start') {
+          this._isEditMode = true;
+        } else if (e.state === 'complete') {
+          this._isEditMode = false;
           this._layerService.setGraphicInstance(e.graphics[0]);
           this._eventService.emitGraphicChange(e.graphics[0]);
         }
       });
 
-      this.view.ui.add(sketch, 'top-right');
+      this.view.ui.add(this.sketch, 'top-right');
     });
+  }
+
+  private _enableEditingOnGraphic(graphic: Graphic): void {
+    // İçe aktarılan grafiği otomatik olarak edit moduna al
+    // Ancak kullanıcı zaten edit modundaysa müdahale etme
+    if (this.sketch && graphic && !this._isEditMode) {
+      this.view.when(() => {
+        setTimeout(() => {
+          if (this.sketch && !this._isEditMode) {
+            this._isEditMode = true;
+            this.sketch.update([graphic], { tool: 'reshape' });
+          }
+        }, 100);
+      });
+    }
   }
 }

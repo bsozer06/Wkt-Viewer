@@ -22,6 +22,54 @@
     </div>
   </div>
 
+  <div class="section-title">Import / Export</div>
+  <div class="import-export-section">
+    <div
+      class="drop-zone"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      [class.drag-over]="isDragging"
+    >
+      <mat-icon>cloud_upload</mat-icon>
+      <p>Drag & drop file here</p>
+      <span class="file-types">Supports: .wkt, .geojson, .json</span>
+      <input
+        type="file"
+        #fileInput
+        (change)="onFileSelected($event)"
+        accept=".wkt,.geojson,.json,.txt"
+        style="display: none"
+      />
+      <button mat-stroked-button type="button" (click)="fileInput.click()">
+        <mat-icon>folder_open</mat-icon>
+        Browse Files
+      </button>
+    </div>
+    <div class="export-buttons">
+      <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        (click)="exportAsWkt()"
+        [disabled]="form.invalid"
+      >
+        <mat-icon>download</mat-icon>
+        Export as WKT
+      </button>
+      <button
+        mat-raised-button
+        color="accent"
+        type="button"
+        (click)="exportAsGeoJSON()"
+        [disabled]="form.invalid"
+      >
+        <mat-icon>download</mat-icon>
+        Export as GeoJSON
+      </button>
+    </div>
+  </div>
+
   <div class="section-title">Input</div>
 
   <div class="grid">
