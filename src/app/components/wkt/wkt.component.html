@@ -1,4 +1,10 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="wkt-form">
+<div class="header">
+  <h2 class="title">WKT Viewer</h2>
+  <p class="subtitle">Visualize Well-Known Text geometries on the map</p>
+</div>
+
+<form [formGroup]="form" class="wkt-form">
+  <div class="section-title">Quick Actions</div>
   <div class="toolbar">
     <div class="left">
       <button mat-stroked-button type="button" (click)="pasteSample('polygon')">
@@ -16,6 +22,8 @@
     </div>
   </div>
 
+  <div class="section-title">Input</div>
+
   <div class="grid">
     <mat-form-field appearance="outline" class="wkt-field">
       <mat-label>WKT</mat-label>
@@ -23,8 +31,8 @@
         matInput
         formControlName="wkt"
         cdkTextareaAutosize
-        cdkAutosizeMinRows="6"
-        cdkAutosizeMaxRows="16"
+        cdkAutosizeMinRows="8"
+        cdkAutosizeMaxRows="18"
         placeholder="Example: POLYGON ((-10 46, -12 34, -14 20, -10 46))"
       ></textarea>
       <mat-hint align="start">Enter WKT geometry (POINT/LINESTRING/POLYGON)</mat-hint>
@@ -44,11 +52,5 @@
       <mat-hint align="start">Coordinate reference system</mat-hint>
       <mat-error *ngIf="form.get('epsg')?.hasError('required')">EPSG is required</mat-error>
     </mat-form-field>
-  </div>
-
-  <div class="actions">
-    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-      Submit
-    </button>
   </div>
 </form>

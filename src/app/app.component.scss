@@ -1,0 +1,33 @@
+.layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  height: calc(100vh - 32px);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.map-pane,
+.form-pane {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map-pane {
+  display: flex;
+}
+
+.map-pane app-map,
+.form-pane app-wkt {
+  display: block;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
