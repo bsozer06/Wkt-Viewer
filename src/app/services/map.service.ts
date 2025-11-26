@@ -10,13 +10,13 @@ import Fullscreen from '@arcgis/core/widgets/Fullscreen';
 import { LayerService } from './layer.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MapService {
   private _mapInstance?: Map;
   private _viewInstance?: MapView;
 
-  constructor(private _layerService: LayerService) { }
+  constructor(private _layerService: LayerService) {}
 
   public initializeMap(mapViewId: string): void {
     const mapViewIdContainer = mapViewId;
@@ -33,15 +33,13 @@ export class MapService {
     return this._viewInstance ?? new MapView();
   }
 
-
-
   private _loadBaseMap(mapViewId: string): void {
     const imageTileLayer = new VectorTileLayer({
-      url: "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer"
+      url: 'https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer',
     });
 
     const basemap = new Basemap({
-      baseLayers: [imageTileLayer]
+      baseLayers: [imageTileLayer],
     });
 
     this._mapInstance = new Map({
@@ -49,9 +47,9 @@ export class MapService {
       // basemap: basemap
       basemap: {
         portalItem: {
-          id: "8dda0e7b5e2d4fafa80132d59122268c" //Streets (WGS84)
-        }
-      }
+          id: '8dda0e7b5e2d4fafa80132d59122268c', //Streets (WGS84)
+        },
+      },
     });
 
     this._viewInstance = new MapView({
@@ -69,19 +67,15 @@ export class MapService {
 
   private _loadCoordinateConvertionTool(): void {
     const ccWidget = new CoordinateConversion({
-      view: this._viewInstance
+      view: this._viewInstance,
     });
-    this._viewInstance?.ui.add(ccWidget, "bottom-left");
+    this._viewInstance?.ui.add(ccWidget, 'bottom-left');
   }
 
   private _loadFullScreen(): void {
     const fullscreen = new Fullscreen({
-      view: this._viewInstance
+      view: this._viewInstance,
     });
-    this._viewInstance?.ui.add(fullscreen, "bottom-right");
+    this._viewInstance?.ui.add(fullscreen, 'bottom-right');
   }
-
-
-
-
 }

@@ -5,20 +5,20 @@ import { WktHelper } from './helpers/wkt.helper';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  public epsg: string = '';
-  public wkt: string = '';
+  public epsg = '';
+  public wkt = '';
   public selectedGraphic!: Graphic;
   title = 'gis-viewer';
 
   // getEpsg(epsg: string) {
   //   console.log(epsg);
   //   this.epsg = epsg;
-    
+
   // }
-  
+
   // getWkt(wkt: string) {
   //   console.log(wkt);
   //   this.wkt = wkt;
@@ -33,7 +33,4 @@ export class AppComponent {
   //   //   console.log('convertedWkt: ', convertedWkt, selectedEpsg);
   //   // }
   // }
-
 }
-
-

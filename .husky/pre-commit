@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# Husky v9+ no longer uses husky.sh; run lint-staged directly
+npx lint-staged

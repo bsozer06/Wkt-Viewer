@@ -3,7 +3,7 @@ import Graphic from '@arcgis/core/Graphic';
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LayerService {
   private _graphic: Graphic;
@@ -11,8 +11,8 @@ export class LayerService {
   private _wkt = '';
   private _epsg = '';
 
-  constructor() { 
-    this._graphicLayer = new GraphicsLayer({ title: 'Vector Layers'});
+  constructor() {
+    this._graphicLayer = new GraphicsLayer({ title: 'Vector Layers' });
     this._graphic = new Graphic();
   }
 
@@ -47,5 +47,4 @@ export class LayerService {
   public setEpsg(epsg: string): void {
     this._epsg = epsg;
   }
-  
 }

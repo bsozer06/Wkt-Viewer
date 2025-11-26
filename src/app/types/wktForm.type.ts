@@ -1,4 +1,4 @@
 export interface WktForm {
-    wkt: string,
-    epsg: string
+  wkt: string;
+  epsg: string;
 }

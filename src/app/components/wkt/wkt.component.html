@@ -1,32 +1,54 @@
-<form #wktForm="ngForm" (ngSubmit)="onSubmit(wktForm)">
-    <div class="form-group">
-        <div class="input-wkt">
-            <label>Enter WKT</label>
-            <textarea rows="5" cols="50"
-                matInput 
-                class="form-control" 
-                id="wkt-textarea-id" 
-                name="wkt" 
-                ngModel
-                [value]="wktFormVal.wkt" 
-                placeholder="Example: POLYGON ((-10 46, -12 34, -14 20, -10 46))">
-            </textarea>
-        </div>
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="wkt-form">
+  <div class="toolbar">
+    <div class="left">
+      <button mat-stroked-button type="button" (click)="pasteSample('polygon')">
+        Sample POLYGON
+      </button>
+      <button mat-stroked-button type="button" (click)="pasteSample('line')">
+        Sample LINESTRING
+      </button>
+      <button mat-stroked-button type="button" (click)="pasteSample('point')">Sample POINT</button>
     </div>
-    <div>
-        <div class="input-epsg">
-            <label>EPSG</label>
-            <textarea rows="5" cols="50"
-                matInput
-                placeholder="Example: 4326" 
-                class="form-control" 
-                id="epsg-textarea-id" 
-                name="epsg" 
-                [value]="wktFormVal.epsg"
-                ngModel>
-            </textarea>
-        </div>
+    <div class="right">
+      <button mat-button type="button" (click)="copyWktToClipboard()">Copy WKT</button>
+      <button mat-button type="button" (click)="clearAll()">Clear</button>
+      <button mat-button type="button" (click)="useMapSpatialReference()">Use Map SR</button>
     </div>
-    <button mat-raised-button color="primary" type="submit">Ok</button>
+  </div>
 
+  <div class="grid">
+    <mat-form-field appearance="outline" class="wkt-field">
+      <mat-label>WKT</mat-label>
+      <textarea
+        matInput
+        formControlName="wkt"
+        cdkTextareaAutosize
+        cdkAutosizeMinRows="6"
+        cdkAutosizeMaxRows="16"
+        placeholder="Example: POLYGON ((-10 46, -12 34, -14 20, -10 46))"
+      ></textarea>
+      <mat-hint align="start">Enter WKT geometry (POINT/LINESTRING/POLYGON)</mat-hint>
+      <mat-hint align="end">{{ form.get('wkt')?.value?.length || 0 }} chars</mat-hint>
+      <mat-error *ngIf="form.get('wkt')?.hasError('required')">WKT is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field
+      appearance="outline"
+      class="epsg-field"
+      matTooltip="4326 = WGS84 (lat/lon), 3857 = Web Mercator"
+    >
+      <mat-label>EPSG</mat-label>
+      <mat-select formControlName="epsg">
+        <mat-option *ngFor="let opt of epsgOptions" [value]="opt.value">{{ opt.label }}</mat-option>
+      </mat-select>
+      <mat-hint align="start">Coordinate reference system</mat-hint>
+      <mat-error *ngIf="form.get('epsg')?.hasError('required')">EPSG is required</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="actions">
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+      Submit
+    </button>
+  </div>
 </form>

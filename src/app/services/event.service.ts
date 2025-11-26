@@ -4,7 +4,7 @@ import { Observable, Subject } from 'rxjs';
 import { WktForm } from '../types/wktForm.type';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EventService {
   private _onGraphicChange: Subject<Graphic>;
@@ -17,7 +17,7 @@ export class EventService {
     // this._onWktChange = new Subject();
     // this._onEpsgChange = new Subject();
     this._onWktFormChange = new Subject();
-   }
+  }
 
   public getOnGraphicChange(): Observable<Graphic> {
     return this._onGraphicChange.asObservable();
@@ -44,6 +44,4 @@ export class EventService {
   public emitWktFormChange(value: WktForm): void {
     this._onWktFormChange.next(value);
   }
-
-
 }
