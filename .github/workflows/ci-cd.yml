@@ -17,7 +17,7 @@ on:
 
 # Environment variables
 env:
-  NODE_VERSION: '14.x'
+  NODE_VERSION: '16.x'
 
 jobs:
   # Job 1: Code quality check (Lint)
