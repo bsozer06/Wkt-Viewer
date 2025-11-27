@@ -12,25 +12,4 @@ export class AppComponent {
   public wkt = '';
   public selectedGraphic!: Graphic;
   title = 'gis-viewer';
-
-  // getEpsg(epsg: string) {
-  //   console.log(epsg);
-  //   this.epsg = epsg;
-
-  // }
-
-  // getWkt(wkt: string) {
-  //   console.log(wkt);
-  //   this.wkt = wkt;
-  // }
-
-  // getSelectedGraphic(graphic: Graphic) {
-  //   this.selectedGraphic = graphic;
-  //   // console.log("app:", graphic);
-  //   // if (graphic?.geometry) {
-  //   //   const convertedWkt = WktHelper.GeometryToWkt(graphic.geometry);
-  //   //   // const selectedEpsg = graphic?.geometry?.spatialReference?.wkid;
-  //   //   console.log('convertedWkt: ', convertedWkt, selectedEpsg);
-  //   // }
-  // }
 }
