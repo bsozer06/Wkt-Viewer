@@ -194,6 +194,26 @@ The project prioritizes testing for business logic and utility functions:
    - **LayerService** (30 tests): State management and singleton behavior
    - **MapService**: Future consideration (requires ArcGIS mocking)
 
+## CI/CD Pipeline
+
+This project uses **GitHub Actions** for continuous integration and deployment to **Netlify**.
+
+### Pipeline Stages
+```
+Push/PR → Lint → Test → Build → Deploy (Netlify)
+```
+
+- **Lint**: ESLint and Prettier code quality checks
+- **Test**: 114 unit tests with code coverage
+- **Build**: Production build with Angular CLI
+- **Deploy**: Automatic deployment to Netlify (master branch only)
+
+### Setup Instructions
+For detailed CI/CD setup instructions, see [CICD-SETUP.md](CICD-SETUP.md)
+
+### Live Demo
+Visit the live application: [https://leafy-travesseiro-7977cd.netlify.app](https://leafy-travesseiro-7977cd.netlify.app)
+
 ## Roadmap / TODOs
 - Switch to NgRx for state management
 - Support more file types (e.g., shapefile, GeoJSON)
