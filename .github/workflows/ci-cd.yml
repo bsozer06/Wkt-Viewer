@@ -125,6 +125,7 @@ jobs:
       
       - name: 🚀 Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
+        id: netlify-deploy
         with:
           publish-dir: './dist/gis-viewer'
           production-branch: master
@@ -139,7 +140,9 @@ jobs:
         timeout-minutes: 5
       
       - name: ✅ Deployment successful
-        run: echo "🎉 Application deployed successfully to Netlify!"
+        run: |
+          echo "🎉 Application deployed successfully to Netlify!"
+          echo "🌐 Production URL: ${{ steps.netlify-deploy.outputs.deploy-url }}"
 
   # Job 5: Deploy Preview (for Pull Requests)
   deploy-preview:
@@ -161,6 +164,7 @@ jobs:
       
       - name: 🔍 Deploy Preview to Netlify
         uses: nwtgck/actions-netlify@v2.0
+        id: netlify-preview
         with:
           publish-dir: './dist/gis-viewer'
           production-branch: master
@@ -174,3 +178,8 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         timeout-minutes: 5
+      
+      - name: ✅ Preview deployment successful
+        run: |
+          echo "🎉 Preview deployed successfully to Netlify!"
+          echo "🌐 Preview URL: ${{ steps.netlify-preview.outputs.deploy-url }}"
