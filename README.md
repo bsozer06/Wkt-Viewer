@@ -1,6 +1,10 @@
 
 # Wkt-Viewer
 
+[![CI/CD Pipeline](https://github.com/bsozer06/Wkt-Viewer/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/bsozer06/Wkt-Viewer/actions/workflows/ci-cd.yml)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c01fdcd2-8592-4fb2-8c57-28453989bf2f/deploy-status)](https://app.netlify.com/sites/leafy-travesseiro-7977cd/deploys)
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://leafy-travesseiro-7977cd.netlify.app)
+
 Wkt-Viewer is a web application for visualizing Well-Known Text (WKT) geometries on an interactive map. Users can input WKT, select coordinate reference systems, and instantly see the geometry rendered using ArcGIS SDK for JavaScript. The app supports import/export of WKT and GeoJSON, and provides a modern UI for quick actions and file management.
 
 ## Features
