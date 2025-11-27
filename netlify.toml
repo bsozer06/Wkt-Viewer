@@ -1,37 +1,37 @@
 [build]
-  # Build komutu
+  # Build command
   command = "npm run build:prod"
   
-  # Publish edilecek dizin (Angular build output)
+  # Directory to publish (Angular build output)
   publish = "dist/gis-viewer"
 
-# SPA için redirect kuralları - Angular routing için gerekli
+# Redirect rules for SPA - Required for Angular routing
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-# Build environment değişkenleri
+# Build environment variables
 [build.environment]
   NODE_VERSION = "14"
   NPM_VERSION = "8"
 
-# Production branch ayarları
+# Production branch settings
 [context.production]
   command = "npm run build:prod"
   publish = "dist/gis-viewer"
 
-# Deploy preview ayarları (PR'ler için)
+# Deploy preview settings (for PRs)
 [context.deploy-preview]
   command = "npm run build:prod"
   publish = "dist/gis-viewer"
 
-# Branch deploy ayarları
+# Branch deploy settings
 [context.branch-deploy]
   command = "npm run build:prod"
   publish = "dist/gis-viewer"
 
-# Headers - Security ve performance için
+# Headers - Security and performance
 [[headers]]
   for = "/*"
   [headers.values]
@@ -40,7 +40,7 @@
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
-# Cache ayarları - Static assets için
+# Cache settings - For static assets
 [[headers]]
   for = "/*.js"
   [headers.values]

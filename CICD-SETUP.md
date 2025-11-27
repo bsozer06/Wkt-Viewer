@@ -1,142 +1,142 @@
-# 🚀 CI/CD Pipeline Kurulum Rehberi
+# 🚀 CI/CD Pipeline Setup Guide
 
-Bu dokümantasyon, Wkt-Viewer projesi için CI/CD pipeline'ının nasıl kurulacağını adım adım açıklar.
+This documentation explains step by step how to set up the CI/CD pipeline for the Wkt-Viewer project.
 
-## 📋 İçindekiler
-1. [Pipeline Genel Bakış](#pipeline-genel-bakış)
-2. [Netlify Kurulumu](#netlify-kurulumu)
-3. [GitHub Secrets Yapılandırması](#github-secrets-yapılandırması)
-4. [CI/CD Pipeline Akışı](#cicd-pipeline-akışı)
-5. [Test ve Doğrulama](#test-ve-doğrulama)
+## 📋 Table of Contents
+1. [Pipeline Overview](#pipeline-overview)
+2. [Netlify Setup](#netlify-setup)
+3. [GitHub Secrets Configuration](#github-secrets-configuration)
+4. [CI/CD Pipeline Flow](#cicd-pipeline-flow)
+5. [Testing and Verification](#testing-and-verification)
 6. [Troubleshooting](#troubleshooting)
 
 ---
 
-## 🎯 Pipeline Genel Bakış
+## 🎯 Pipeline Overview
 
-### Oluşturulan Dosyalar
-1. **`netlify.toml`** - Netlify yapılandırma dosyası
-2. **`.github/workflows/ci-cd.yml`** - GitHub Actions workflow dosyası
-3. **`package.json`** - Build script'leri güncellendi
+### Created Files
+1. **`netlify.toml`** - Netlify configuration file
+2. **`.github/workflows/ci-cd.yml`** - GitHub Actions workflow file
+3. **`package.json`** - Build scripts updated
 
-### Pipeline Aşamaları
+### Pipeline Stages
 ```
 Push/PR → Lint → Test → Build → Deploy (Netlify)
 ```
 
-#### 1. 🔍 Lint Aşaması
-- ESLint ile kod kalitesi kontrolü
-- Prettier ile format kontrolü
-- Hızlı geri bildirim
+#### 1. 🔍 Lint Stage
+- Code quality check with ESLint
+- Format check with Prettier
+- Quick feedback
 
-#### 2. 🧪 Test Aşaması
-- Tüm unit testler (114 test)
-- Code coverage raporu
-- ChromeHeadless ile headless test
+#### 2. 🧪 Test Stage
+- All unit tests (114 tests)
+- Code coverage report
+- Headless testing with ChromeHeadless
 
-#### 3. 🏗️ Build Aşaması
+#### 3. 🏗️ Build Stage
 - Production build (`ng build --configuration production`)
-- Artifact olarak saklama
+- Store as artifact
 - Output: `dist/gis-viewer/`
 
-#### 4. 🚀 Deploy Aşaması
+#### 4. 🚀 Deploy Stage
 - Master branch → Production deploy
 - Pull Request → Preview deploy
-- Otomatik yorum ve link
+- Automatic comments and links
 
 ---
 
-## 🌐 Netlify Kurulumu
+## 🌐 Netlify Setup
 
-### Adım 1: Netlify Hesabı Oluşturma
-1. [netlify.com](https://www.netlify.com/) adresine gidin
-2. GitHub hesabınızla giriş yapın
-3. "Sign up with GitHub" seçeneğini kullanın
+### Step 1: Create Netlify Account
+1. Go to [netlify.com](https://www.netlify.com/)
+2. Sign in with your GitHub account
+3. Use "Sign up with GitHub" option
 
-### Adım 2: Yeni Site Oluşturma
+### Step 2: Create New Site
 
-#### Yöntem A: Manuel Site Oluşturma (Önerilen)
-1. Netlify dashboard'a gidin
-2. "Add new site" → "Import an existing project" tıklayın
-3. **VEYA** "Deploy manually" seçeneğini kullanın
-4. Site oluşturulduktan sonra:
+#### Method A: Manual Site Creation (Recommended)
+1. Go to Netlify dashboard
+2. Click "Add new site" → "Import an existing project"
+3. **OR** use "Deploy manually" option
+4. After site is created:
    - Site settings → Site details
-   - **Site ID**'yi not alın (örn: `abc123-def456-ghi789`)
+   - Note the **Site ID** (e.g., `abc123-def456-ghi789`)
 
-#### Yöntem B: Netlify CLI ile
+#### Method B: Using Netlify CLI
 ```bash
-# Netlify CLI kurulumu
+# Install Netlify CLI
 npm install -g netlify-cli
 
 # Login
 netlify login
 
-# Yeni site oluştur
+# Create new site
 netlify sites:create --name wkt-viewer
 
-# Site ID'yi göster
+# Show Site ID
 netlify sites:list
 ```
 
-### Adım 3: Netlify Authentication Token Alma
+### Step 3: Get Netlify Authentication Token
 1. Netlify dashboard → User settings
 2. "Applications" → "Personal access tokens"
-3. "New access token" butonuna tıklayın
-4. Token adı: `github-actions-deploy`
-5. Token'ı kopyalayın ve güvenli bir yere kaydedin
-6. ⚠️ **ÖNEMLİ**: Bu token sadece bir kez gösterilir!
+3. Click "New access token" button
+4. Token name: `github-actions-deploy`
+5. Copy the token and save it securely
+6. ⚠️ **IMPORTANT**: This token is shown only once!
 
-### Adım 4: Site Ayarları (Opsiyonel)
+### Step 4: Site Settings (Optional)
 1. Site settings → Build & deploy
-2. "Build settings" kısmında şunlar zaten `netlify.toml`'de tanımlı:
+2. The following are already defined in `netlify.toml`:
    - Build command: `npm run build:prod`
    - Publish directory: `dist/gis-viewer`
-3. "Continuous Deployment" ayarlarını kapatabilirsiniz (GitHub Actions kullanacağız)
+3. You can disable "Continuous Deployment" settings (we'll use GitHub Actions)
 
 ---
 
-## 🔐 GitHub Secrets Yapılandırması
+## 🔐 GitHub Secrets Configuration
 
-### Gerekli Secrets
-GitHub repository'nizde aşağıdaki secrets'ları tanımlamanız gerekiyor:
+### Required Secrets
+You need to define the following secrets in your GitHub repository:
 
 1. **NETLIFY_AUTH_TOKEN** - Netlify personal access token
 2. **NETLIFY_SITE_ID** - Netlify site ID
-3. **CODECOV_TOKEN** (Opsiyonel) - Codecov integration için
+3. **CODECOV_TOKEN** (Optional) - For Codecov integration
 
-### Secrets Ekleme Adımları
-1. GitHub repository'nize gidin
+### Steps to Add Secrets
+1. Go to your GitHub repository
 2. Settings → Secrets and variables → Actions
-3. "New repository secret" tıklayın
-4. Her bir secret'ı ekleyin:
+3. Click "New repository secret"
+4. Add each secret:
 
 #### NETLIFY_AUTH_TOKEN
 ```
 Name: NETLIFY_AUTH_TOKEN
-Value: <Adım 3'te aldığınız Netlify token>
+Value: <Netlify token from Step 3>
 ```
 
 #### NETLIFY_SITE_ID
 ```
 Name: NETLIFY_SITE_ID
-Value: <Adım 2'de aldığınız Site ID>
+Value: <Site ID from Step 2>
 ```
 
-#### CODECOV_TOKEN (Opsiyonel)
+#### CODECOV_TOKEN (Optional)
 ```
 Name: CODECOV_TOKEN
-Value: <Codecov.io'dan alacağınız token>
+Value: <Token from Codecov.io>
 ```
 
-### Secrets Doğrulama
+### Verify Secrets
 ```bash
-# GitHub CLI ile kontrol (GitHub CLI gerektirir)
+# Check with GitHub CLI (requires GitHub CLI)
 gh secret list
 ```
 
 ---
 
-## 🔄 CI/CD Pipeline Akışı
+## 🔄 CI/CD Pipeline Flow
 
 ### Master Branch Push
 ```mermaid
@@ -148,15 +148,15 @@ graph LR
     E --> F[Netlify Production URL]
 ```
 
-**Akış:**
-1. Master branch'e kod push edilir
-2. Lint aşaması çalışır (ESLint + Prettier)
-3. Test aşaması çalışır (114 unit test)
-4. Build aşaması çalışır (production build)
-5. Deploy aşaması çalışır (Netlify production)
-6. Commit'e deployment URL'i eklenir
+**Flow:**
+1. Code is pushed to master branch
+2. Lint stage runs (ESLint + Prettier)
+3. Test stage runs (114 unit tests)
+4. Build stage runs (production build)
+5. Deploy stage runs (Netlify production)
+6. Deployment URL is added to commit
 
-**Beklenen Süre:** ~5-8 dakika
+**Expected Duration:** ~5-8 minutes
 
 ### Pull Request
 ```mermaid
@@ -168,15 +168,15 @@ graph LR
     E --> F[Netlify Preview URL]
 ```
 
-**Akış:**
-1. Pull Request oluşturulur
-2. Lint aşaması çalışır
-3. Test aşaması çalışır
-4. Build aşaması çalışır
-5. Preview deployment oluşturulur
-6. PR'a preview URL'i yorum olarak eklenir
+**Flow:**
+1. Pull Request is created
+2. Lint stage runs
+3. Test stage runs
+4. Build stage runs
+5. Preview deployment is created
+6. Preview URL is added as comment to PR
 
-**Beklenen Süre:** ~5-8 dakika
+**Expected Duration:** ~5-8 minutes
 
 ### Develop Branch Push
 ```mermaid
@@ -187,127 +187,127 @@ graph LR
     D --> E[Artifacts Saved]
 ```
 
-**Akış:**
-1. Develop branch'e kod push edilir
-2. Lint, test ve build çalışır
-3. Deploy edilmez, sadece build artifacts saklanır
-4. Master'a merge öncesi doğrulama
+**Flow:**
+1. Code is pushed to develop branch
+2. Lint, test and build run
+3. No deployment, only build artifacts are saved
+4. Verification before merging to master
 
 ---
 
-## ✅ Test ve Doğrulama
+## ✅ Testing and Verification
 
-### Lokal Test
-Pipeline'ı test etmek için lokal olarak çalıştırın:
+### Local Testing
+Run locally to test the pipeline:
 
 ```bash
-# 1. Lint kontrolü
+# 1. Lint check
 npm run lint
 
-# 2. Format kontrolü
+# 2. Format check
 npm run format -- --check
 
-# 3. Test çalıştır
+# 3. Run tests
 npm run test:ci
 
 # 4. Production build
 npm run build:prod
 
-# 5. Build output kontrol
+# 5. Check build output
 ls dist/gis-viewer
 ```
 
-### İlk Deploy
-1. Tüm değişiklikleri commit edin:
+### First Deploy
+1. Commit all changes:
 ```bash
 git add .
 git commit -m "feat: add CI/CD pipeline with Netlify"
 git push origin master
 ```
 
-2. GitHub Actions sekmesine gidin
-3. Workflow'un çalışmasını izleyin
-4. Her aşamanın başarılı olduğunu kontrol edin
+2. Go to GitHub Actions tab
+3. Watch the workflow run
+4. Verify that each stage is successful
 
-### Deployment Doğrulama
-1. GitHub Actions'da "Deploy to Netlify" jobunu açın
-2. Netlify deployment URL'ini bulun
-3. URL'i tarayıcıda açın
-4. Uygulamanın çalıştığını doğrulayın
+### Deployment Verification
+1. Open "Deploy to Netlify" job in GitHub Actions
+2. Find the Netlify deployment URL
+3. Open the URL in browser
+4. Verify the application is running
 
 ### Preview Deploy Test
-1. Yeni bir branch oluşturun:
+1. Create a new branch:
 ```bash
 git checkout -b feature/test-ci-cd
 ```
 
-2. Küçük bir değişiklik yapın
-3. Push ve PR oluşturun:
+2. Make a small change
+3. Push and create PR:
 ```bash
 git add .
 git commit -m "test: CI/CD preview"
 git push origin feature/test-ci-cd
 ```
 
-4. PR'da Netlify preview linkini kontrol edin
+4. Check the Netlify preview link in the PR
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Yaygın Sorunlar ve Çözümleri
+### Common Issues and Solutions
 
 #### 1. "NETLIFY_AUTH_TOKEN not found"
-**Sorun:** GitHub Secrets tanımlanmamış
+**Issue:** GitHub Secrets not defined
 
-**Çözüm:**
+**Solution:**
 - GitHub → Settings → Secrets → Actions
-- NETLIFY_AUTH_TOKEN'ı ekleyin
+- Add NETLIFY_AUTH_TOKEN
 
 #### 2. "NETLIFY_SITE_ID not found"
-**Sorun:** Site ID yanlış veya eksik
+**Issue:** Site ID is incorrect or missing
 
-**Çözüm:**
+**Solution:**
 - Netlify → Site settings → Site details
-- Site ID'yi kopyalayıp GitHub Secrets'a ekleyin
+- Copy Site ID and add to GitHub Secrets
 
 #### 3. "Build failed: Cannot find module"
-**Sorun:** Dependencies eksik
+**Issue:** Missing dependencies
 
-**Çözüm:**
+**Solution:**
 ```bash
-# package-lock.json'ı commit edin
+# Commit package-lock.json
 git add package-lock.json
 git commit -m "chore: add package-lock.json"
 git push
 ```
 
 #### 4. "Tests failed in CI"
-**Sorun:** Lokal çalışan testler CI'da başarısız
+**Issue:** Tests pass locally but fail in CI
 
-**Çözüm:**
+**Solution:**
 ```bash
-# CI environment'ı simüle edin
+# Simulate CI environment
 npm run test:ci
 
-# ChromeHeadless sorunları için
-# karma.conf.js'de customLaunchers kontrol edin
+# For ChromeHeadless issues
+# Check customLaunchers in karma.conf.js
 ```
 
 #### 5. "Netlify Deploy Timeout"
-**Sorun:** Deploy 5 dakikadan uzun sürüyor
+**Issue:** Deploy takes longer than 5 minutes
 
-**Çözüm:**
-- `ci-cd.yml`'de `timeout-minutes` değerini artırın:
+**Solution:**
+- Increase `timeout-minutes` in `ci-cd.yml`:
 ```yaml
 timeout-minutes: 10
 ```
 
 #### 6. "Angular Routing 404"
-**Sorun:** Netlify'da route'lar çalışmıyor
+**Issue:** Routes don't work on Netlify
 
-**Çözüm:**
-- `netlify.toml` dosyasında redirect kuralı var mı kontrol edin:
+**Solution:**
+- Check if redirect rule exists in `netlify.toml`:
 ```toml
 [[redirects]]
   from = "/*"
@@ -315,55 +315,55 @@ timeout-minutes: 10
   status = 200
 ```
 
-### Log İnceleme
+### Log Inspection
 ```bash
 # GitHub Actions logs
-# GitHub → Actions → İlgili workflow → Job details
+# GitHub → Actions → Relevant workflow → Job details
 
 # Netlify deploy logs
-# Netlify → Deploys → İlgili deploy → Deploy log
+# Netlify → Deploys → Relevant deploy → Deploy log
 ```
 
 ---
 
-## 📊 İzleme ve Optimizasyon
+## 📊 Monitoring and Optimization
 
-### Build Süresini Optimize Etme
-1. **Cache kullanımı**: GitHub Actions'da npm cache zaten aktif
-2. **Paralel jobs**: Lint ve test paralel çalışabilir (şu an sıralı)
-3. **Incremental build**: Angular'ın incremental build özelliğini kullanın
+### Optimizing Build Time
+1. **Cache usage**: npm cache is already active in GitHub Actions
+2. **Parallel jobs**: Lint and test can run in parallel (currently sequential)
+3. **Incremental build**: Use Angular's incremental build feature
 
-### Bildirimler
-1. **Slack entegrasyonu**: GitHub Actions → Slack
-2. **Email bildirimleri**: GitHub Settings → Notifications
+### Notifications
+1. **Slack integration**: GitHub Actions → Slack
+2. **Email notifications**: GitHub Settings → Notifications
 3. **Netlify notifications**: Netlify → Site settings → Build & deploy → Deploy notifications
 
-### Metrikler
-- **Build başarı oranı**: GitHub Actions → Insights
-- **Deploy süresi**: Netlify → Site analytics
+### Metrics
+- **Build success rate**: GitHub Actions → Insights
+- **Deploy time**: Netlify → Site analytics
 - **Test coverage**: Codecov dashboard
 
 ---
 
-## 🎉 Sonuç
+## 🎉 Conclusion
 
-CI/CD pipeline başarıyla kuruldu! Artık:
+CI/CD pipeline successfully set up! Now you have:
 
-✅ Her push'ta otomatik test
-✅ Her push'ta otomatik build
-✅ Master branch'te otomatik deploy
-✅ PR'larda otomatik preview
-✅ Kod kalitesi kontrolleri
+✅ Automatic tests on every push
+✅ Automatic build on every push
+✅ Automatic deploy on master branch
+✅ Automatic preview on PRs
+✅ Code quality checks
 
-### Sonraki Adımlar
-1. Badge ekleyin README.md'ye
-2. Codecov entegrasyonu
-3. E2E testler ekleyin
+### Next Steps
+1. Add badges to README.md
+2. Codecov integration
+3. Add E2E tests
 4. Performance monitoring (Lighthouse CI)
 5. Automated versioning (semantic-release)
 
 ### Pipeline Badge
-README.md'ye eklemek için:
+To add to README.md:
 ```markdown
 ![CI/CD](https://github.com/bsozer06/Wkt-Viewer/workflows/CI/CD%20Pipeline/badge.svg)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR-SITE-ID/deploy-status)](https://app.netlify.com/sites/YOUR-SITE-NAME/deploys)
@@ -371,11 +371,11 @@ README.md'ye eklemek için:
 
 ---
 
-## 📞 Destek
+## 📞 Support
 
-Sorun yaşarsanız:
-1. GitHub Issues açın
-2. Pipeline loglarını paylaşın
-3. Hata mesajlarını ekleyin
+If you encounter any issues:
+1. Open GitHub Issues
+2. Share pipeline logs
+3. Include error messages
 
-**İyi deploymentlar! 🚀**
+**Happy deployments! 🚀**
