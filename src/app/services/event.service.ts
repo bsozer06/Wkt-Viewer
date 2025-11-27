@@ -22,6 +22,9 @@ export class EventService {
   public getOnGraphicChange(): Observable<Graphic> {
     return this._onGraphicChange.asObservable();
   }
+  public emitGraphicChange(graphic: Graphic): void {
+    this._onGraphicChange.next(graphic);
+  }
   // public getOnEpsgChange(): Observable<string> {
   //   return this._onEpsgChange.asObservable();
   // }
@@ -31,17 +34,14 @@ export class EventService {
   public getOnWktFormChange(): Observable<WktForm> {
     return this._onWktFormChange.asObservable();
   }
-
-  public emitGraphicChange(graphic: Graphic): void {
-    this._onGraphicChange.next(graphic);
+  public emitWktFormChange(value: WktForm): void {
+    this._onWktFormChange.next(value);
   }
+
   // public emitWktChange(wkt: string): void {
   //   this._onWktChange.next(wkt);
   // }
   // public emitEpsgChange(epsg: string): void {
   //   this._onEpsgChange.next(epsg);
   // }
-  public emitWktFormChange(value: WktForm): void {
-    this._onWktFormChange.next(value);
-  }
 }
