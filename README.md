@@ -44,6 +44,71 @@ Open [http://localhost:4200](http://localhost:4200) in your browser.
 npm test
 ```
 
+The project includes comprehensive unit tests for critical components:
+
+#### Test Summary
+- **Total: 114 tests** - All passing ✅
+- **WktHelper**: 42 tests
+- **ProjectionHelper**: 11 tests
+- **MapGraphicsHelper**: 32 tests
+- **EventService**: 18 tests
+- **LayerService**: 30 tests
+- **AppComponent**: 1 test
+
+#### WktHelper Tests (42 tests)
+All WKT parsing and conversion methods:
+- `GetGeomType`: Geometry type detection (POINT, LINESTRING, POLYGON, MULTIPOINT)
+- `WktToCoordArray`: WKT to coordinate array conversion
+- `GeometryToWkt`: ArcGIS geometry to WKT conversion
+- `WktToGeoJSON`: WKT to GeoJSON Feature conversion with CRS support
+- `GeoJSONToWkt`: GeoJSON to WKT conversion with EPSG extraction
+- `FeaturesToMultiPointWkt`: Multiple Point features to MULTIPOINT WKT
+- Edge cases: null/undefined values, invalid formats, empty arrays
+- Coordinate formats: decimal, negative, various whitespace handling
+
+#### ProjectionHelper Tests (11 tests)
+Coordinate reprojection functionality:
+- `ReprojectCoords`: EPSG transformation with Proj4
+- Same EPSG handling (no transformation)
+- Empty coordinates handling
+- Multiple coordinate pairs
+- Negative coordinates
+- Error handling and fallback
+
+#### MapGraphicsHelper Tests (32 tests)
+Graphics layer management:
+- `addPointToGraphicLayer`: Point graphic creation and styling
+- `addLinestringToGraphicLayer`: Polyline graphic creation
+- `addPolygonToGraphicLayer`: Polygon graphic creation with fill/outline
+- `addMultiPointToGraphicLayer`: Multiple point graphics
+- Coordinate validation and error handling
+- Different spatial references (EPSG:4326, EPSG:3857)
+
+#### EventService Tests (18 tests)
+RxJS-based component communication:
+- Graphic change events emission and subscription
+- WktForm change events
+- Multiple subscribers support
+- Observable functionality
+
+#### LayerService Tests (30 tests)
+State management for graphics and WKT:
+- GraphicsLayer instance management
+- Graphic instance management
+- WKT string storage and retrieval
+- EPSG code management
+- Combined state management
+- Service singleton behavior
+
+Run specific test files:
+```sh
+npm test -- --include='**/wkt.helper.spec.ts'
+npm test -- --include='**/projection.helper.spec.ts'
+npm test -- --include='**/map-graphics.helper.spec.ts'
+npm test -- --include='**/event.service.spec.ts'
+npm test -- --include='**/layer.service.spec.ts'
+```
+
 ## Project Structure
 
 ```
@@ -68,12 +133,32 @@ Component communication is handled via `EventService` (RxJS Subjects). Angular I
 
 ### Helpers
 - **ProjectionHelper**: Coordinate reprojection (ArcGIS & Proj4)
+  - Tested with 11 unit tests
+  - EPSG transformation using Proj4
+  - Handles coordinate reprojection between different CRS
 - **WktHelper**: WKT parsing and conversion
+  - Pure static utility class with no external dependencies
+  - Fully tested with 42 unit tests
+  - Handles POINT, LINESTRING, POLYGON, MULTIPOINT geometries
+  - Bidirectional conversion between WKT, GeoJSON, and ArcGIS geometries
+  - EPSG/CRS support for coordinate reference systems
+- **MapGraphicsHelper**: Graphics layer utilities
+  - Tested with 32 unit tests
+  - Point, LineString, Polygon, and MultiPoint graphic creation
+  - Configurable styling and symbology
 
 ### Services
 - **EventService**: Component communication
+  - Tested with 18 unit tests
+  - RxJS-based event system for Graphic and WktForm changes
+  - Multiple subscriber support
 - **MapService**: Map initialization and management
+  - ArcGIS map instance creation
+  - Coordinate conversion and fullscreen widgets
 - **LayerService**: Graphics layer management
+  - Tested with 30 unit tests
+  - State management for graphics, WKT, and EPSG
+  - Singleton service pattern
 
 ### Types
 - **WktForm**: WKT form model
@@ -81,13 +166,38 @@ Component communication is handled via `EventService` (RxJS Subjects). Angular I
 ## Contributing
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
+## Testing Strategy
+
+The project prioritizes testing for business logic and utility functions:
+
+1. **WktHelper** ✅ - **Completed** (42 tests)
+   - Pure logic with no external dependencies
+   - Critical functionality for WKT/GeoJSON conversion
+   - High risk for parsing errors
+   
+2. **ProjectionHelper** ✅ - **Completed** (11 tests)
+   - Coordinate transformation logic
+   - Multiple EPSG support validation
+   - Proj4 integration testing
+
+3. **MapGraphicsHelper** ✅ - **Completed** (32 tests)
+   - Graphics layer management
+   - Symbol and geometry creation
+   - ArcGIS integration testing
+
+4. **Services** ✅ - **Completed** (48 tests)
+   - **EventService** (18 tests): RxJS Subject/Observable patterns
+   - **LayerService** (30 tests): State management and singleton behavior
+   - **MapService**: Future consideration (requires ArcGIS mocking)
+
 ## Roadmap / TODOs
 - Switch to NgRx for state management
 - Support more file types (e.g., shapefile, GeoJSON)
-- Enhance projection helper with Proj4
-- Improve LayerService
 - Add more geometry types and features
 - Remove unnecessary comments and refactor code
+- Add unit tests for MapService (requires ArcGIS SDK mocking)
+- Add unit tests for UI components (MapComponent, WktComponent)
+- Improve test coverage for edge cases and error scenarios
 
 ## License
 MIT
