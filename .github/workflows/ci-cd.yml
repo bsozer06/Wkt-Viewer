@@ -135,8 +135,8 @@ jobs:
           enable-commit-comment: true
           overwrites-pull-request-comment: true
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.WKTVIEWER }}
+          NETLIFY_SITE_ID: c01fdcd2-8592-4fb2-8c57-28453989bf2f
         timeout-minutes: 5
       
       - name: ✅ Deployment successful
@@ -176,8 +176,8 @@ jobs:
           overwrites-pull-request-comment: true
           alias: pr-${{ github.event.pull_request.number }}
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.WKTVIEWER }}
+          NETLIFY_SITE_ID: c01fdcd2-8592-4fb2-8c57-28453989bf2f
         timeout-minutes: 5
       
       - name: ✅ Preview deployment successful
