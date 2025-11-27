@@ -18,7 +18,6 @@ on:
 # Environment variables
 env:
   NODE_VERSION: '14.x'
-  CACHE_KEY: node-modules-${{ hashFiles('**/package-lock.json') }}
 
 jobs:
   # Job 1: Code quality check (Lint)
