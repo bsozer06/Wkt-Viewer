@@ -11,7 +11,7 @@ Wkt-Viewer is a web application for visualizing Well-Known Text (WKT) geometries
 - **Edit Geometry**: Use ArcGIS Sketch tool to edit imported or drawn graphics directly on the map.
 
 ## Screenshot
-![Wkt-Viewer Screenshot](attachments://c8b6e2e2-2e2e-4e2e-8e2e-2e2e4e2e8e2e)
+![Wkt-Viewer Screenshot](src/assets/wkt-viewer-screenshot.png)
 
 ## Technologies Used
 - **Angular**: 13.3.2
