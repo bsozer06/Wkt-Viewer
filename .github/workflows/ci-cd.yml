@@ -1,0 +1,177 @@
+name: CI/CD Pipeline
+
+# Workflow tetikleyicileri
+on:
+  # Push olduğunda çalış
+  push:
+    branches:
+      - master
+      - develop
+  # Pull request olduğunda çalış
+  pull_request:
+    branches:
+      - master
+      - develop
+  # Manuel tetikleme için
+  workflow_dispatch:
+
+# Environment variables
+env:
+  NODE_VERSION: '14.x'
+  CACHE_KEY: node-modules-${{ hashFiles('**/package-lock.json') }}
+
+jobs:
+  # Job 1: Kod kalitesi kontrolü (Lint)
+  lint:
+    name: 🔍 Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: 🔍 Run ESLint
+        run: npm run lint
+      
+      - name: 💅 Check code formatting
+        run: npm run format -- --check
+
+  # Job 2: Unit testler
+  test:
+    name: 🧪 Test
+    runs-on: ubuntu-latest
+    needs: lint
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: 🧪 Run tests with coverage
+        run: npm run test:ci
+      
+      - name: 📊 Upload coverage to Codecov (optional)
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  # Job 3: Build
+  build:
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: 🏗️ Build application
+        run: npm run build:prod
+      
+      - name: 📦 Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/gis-viewer
+          retention-days: 7
+
+  # Job 4: Deploy to Netlify
+  deploy:
+    name: 🚀 Deploy to Netlify
+    runs-on: ubuntu-latest
+    needs: build
+    # Sadece master branch'e push olduğunda deploy et
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+      
+      - name: 📦 Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/gis-viewer
+      
+      - name: 🚀 Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: './dist/gis-viewer'
+          production-branch: master
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions - ${{ github.event.head_commit.message }}"
+          enable-pull-request-comment: true
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 5
+      
+      - name: ✅ Deployment successful
+        run: echo "🎉 Application deployed successfully to Netlify!"
+
+  # Job 5: Deploy Preview (Pull Request için)
+  deploy-preview:
+    name: 🔍 Deploy Preview
+    runs-on: ubuntu-latest
+    needs: build
+    # Sadece Pull Request olduğunda çalış
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+      
+      - name: 📦 Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/gis-viewer
+      
+      - name: 🔍 Deploy Preview to Netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: './dist/gis-viewer'
+          production-branch: master
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy preview from PR #${{ github.event.pull_request.number }}"
+          enable-pull-request-comment: true
+          enable-commit-comment: false
+          overwrites-pull-request-comment: true
+          alias: pr-${{ github.event.pull_request.number }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 5

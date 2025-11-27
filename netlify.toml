@@ -1,0 +1,57 @@
+[build]
+  # Build komutu
+  command = "npm run build:prod"
+  
+  # Publish edilecek dizin (Angular build output)
+  publish = "dist/gis-viewer"
+
+# SPA için redirect kuralları - Angular routing için gerekli
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Build environment değişkenleri
+[build.environment]
+  NODE_VERSION = "14"
+  NPM_VERSION = "8"
+
+# Production branch ayarları
+[context.production]
+  command = "npm run build:prod"
+  publish = "dist/gis-viewer"
+
+# Deploy preview ayarları (PR'ler için)
+[context.deploy-preview]
+  command = "npm run build:prod"
+  publish = "dist/gis-viewer"
+
+# Branch deploy ayarları
+[context.branch-deploy]
+  command = "npm run build:prod"
+  publish = "dist/gis-viewer"
+
+# Headers - Security ve performance için
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache ayarları - Static assets için
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
